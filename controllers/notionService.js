@@ -62,8 +62,7 @@ function getStorageOptionId(locationName, options) {
     if (locationName == null) {
         // Handle the case where locationName is null or undefined
         // For example, return the id of the default storage option
-        const defaultOption = options.find(opt => opt.name === "Missing");
-        return defaultOption ? defaultOption.id : null;
+        locationName = "Missing";
     }
     const option = options.find(opt => opt.name === locationName);
     return option ? option.id : null;
@@ -71,7 +70,7 @@ function getStorageOptionId(locationName, options) {
 
 
   const createPages = asyncWrapper(async (dataToCreatePages) => {
-    // console.log(notion);
+    console.log("🚀 ~ file:heyho this data is being passed into createPages notionService.js:74 ~ createPages ~ dataToCreatePages:", dataToCreatePages)
     const mongoData = await myMongooseModel.find({});
     // console.log("🚀 ~ file: notionService.js:67 ~ createPages ~ mongoData:", mongoData)
 
@@ -82,7 +81,8 @@ function getStorageOptionId(locationName, options) {
         { id: "zJI|", name: "Missing" },
         { id: "_gzg", name: "Cupboard" },
         { id: ":^>^", name: "Frozen" },
-        { id: "rKoC", name: "Fridge" }
+        { id: "rKoC", name: "Fridge" },
+
     ];
     // console.log("this is mongoData logged in notionService on line 15: ", mongoData);
     const createdRows = [];
