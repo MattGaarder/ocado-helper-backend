@@ -38,7 +38,9 @@ const addIngredients = asyncWrapper(async (req, res, next) => {
         name: ingredient.name,
         location: ingredient.location }));
     const insertedIngredients = await Ingredient.insertMany(ingredientObjects);
-    res.status(200).json({ ingredients: insertedIngredients });
+    const result = await createPages(insertedIngredients);
+    res.status(200).json({ ingredients: insertedIngredients, ...result });
+    // I want to call the Notion function here
 });
 
 const addNotionIDToMongoEntryVariable = async function addNotionIDToMongoEntry(notionDataArray) {

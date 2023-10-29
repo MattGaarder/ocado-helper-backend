@@ -61,13 +61,13 @@ function getStorageOptionId(locationName, options) {
     return null;  // or throw an error if you want stricter checking
   }
 
-const createPages = asyncWrapper(async(req, res) => {
+  const createPages = asyncWrapper(async (dataToCreatePages) => {
     // console.log(notion);
     const mongoData = await myMongooseModel.find({});
     console.log("🚀 ~ file: notionService.js:67 ~ createPages ~ mongoData:", mongoData)
-    
+
     if (!mongoData) {
-        return res.status(404).json({ error: 'Data not found in MongoDB' });
+        throw new Error('Data not found in MongoDB');
     }
     const storageOptions = [
         { id: "zJI|", name: "Missing" },
@@ -77,11 +77,11 @@ const createPages = asyncWrapper(async(req, res) => {
     ];
     // console.log("this is mongoData logged in notionService on line 15: ", mongoData);
     const createdRows = [];
-    for(let data of mongoData){
+    for (let data of mongoData) {
         const storageOptionId = getStorageOptionId(data.location, storageOptions);
         console.log("🚀 ~ file: notionService.js:80 ~ createPages ~ data.location:", data.location)
         console.log("🚀 ~ file: notionService.js:80 ~ createPages ~ storageOptionId:", storageOptionId)
-        
+
         // console.log("logging data.name when iterating through data of mondoData in notionService", data);
         const notionData = await notion.pages.create({
             "parent": {
@@ -115,17 +115,86 @@ const createPages = asyncWrapper(async(req, res) => {
                             }
                         }
                     ]
-                },                 
+                },
             }
         });
         createdRows.push(notionData)
-        
+
     }
     console.log("skipittytoilet:: ", createdRows[0].properties.MONGO_ID.rich_text[0].plain_text);
     console.log("itsabwoodapp:: ", createdRows[0].id);
     addNotionIDToMongoEntryVariable(createdRows);
-    res.status(200).json({ mongoData, createdRows });
+
+    // Return the created rows and mongo data instead of sending a response
+    return { mongoData, createdRows };
 });
+
+
+// const createPages = asyncWrapper(async(req, res) => {
+//     // console.log(notion);
+//     const mongoData = await myMongooseModel.find({});
+//     console.log("🚀 ~ file: notionService.js:67 ~ createPages ~ mongoData:", mongoData)
+    
+//     if (!mongoData) {
+//         return res.status(404).json({ error: 'Data not found in MongoDB' });
+//     }
+//     const storageOptions = [
+//         { id: "zJI|", name: "Missing" },
+//         { id: "_gzg", name: "Cupboard" },
+//         { id: ":^>^", name: "Frozen" },
+//         { id: "rKoC", name: "Fridge" }
+//     ];
+//     // console.log("this is mongoData logged in notionService on line 15: ", mongoData);
+//     const createdRows = [];
+//     for(let data of mongoData){
+//         const storageOptionId = getStorageOptionId(data.location, storageOptions);
+//         console.log("🚀 ~ file: notionService.js:80 ~ createPages ~ data.location:", data.location)
+//         console.log("🚀 ~ file: notionService.js:80 ~ createPages ~ storageOptionId:", storageOptionId)
+        
+//         // console.log("logging data.name when iterating through data of mondoData in notionService", data);
+//         const notionData = await notion.pages.create({
+//             "parent": {
+//                 "type": "database_id",  // Replace with your Notion database ID
+//                 "database_id": process.env.NOTION_DATABASE_ID
+//             },
+//             "properties": {
+//                 "Item": {
+//                     "title": [
+//                         {
+//                             "type": "text",
+//                             "text": {
+//                                 "content": data.name,
+//                             }
+//                         }
+//                     ]
+//                 },
+//                 "Storage": {
+//                     "multi_select": [
+//                         {
+//                             "id": storageOptionId
+//                         }
+//                     ]
+//                 },
+//                 "MONGO_ID": {
+//                     "rich_text": [
+//                         {
+//                             "type": "text",
+//                             "text": {
+//                                 "content": data._id.toString(),
+//                             }
+//                         }
+//                     ]
+//                 },                 
+//             }
+//         });
+//         createdRows.push(notionData)
+        
+//     }
+//     console.log("skipittytoilet:: ", createdRows[0].properties.MONGO_ID.rich_text[0].plain_text);
+//     console.log("itsabwoodapp:: ", createdRows[0].id);
+//     addNotionIDToMongoEntryVariable(createdRows);
+//     res.status(200).json({ mongoData, createdRows });
+// });
 
 const updateData = asyncWrapper(async(req, res) => {
     const updateData = await notion.databases.create({});
