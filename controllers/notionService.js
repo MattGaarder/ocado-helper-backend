@@ -55,16 +55,25 @@ const getIds = async (databaseId, authToken) => {
 //     return mongoData;
 // })
 
+
+
+
 function getStorageOptionId(locationName, options) {
+    if (locationName == null) {
+        // Handle the case where locationName is null or undefined
+        // For example, return the id of the default storage option
+        const defaultOption = options.find(opt => opt.name === "Missing");
+        return defaultOption ? defaultOption.id : null;
+    }
     const option = options.find(opt => opt.name === locationName);
-    if (option) return option.id;
-    return null;  // or throw an error if you want stricter checking
-  }
+    return option ? option.id : null;
+}
+
 
   const createPages = asyncWrapper(async (dataToCreatePages) => {
     // console.log(notion);
     const mongoData = await myMongooseModel.find({});
-    console.log("🚀 ~ file: notionService.js:67 ~ createPages ~ mongoData:", mongoData)
+    // console.log("🚀 ~ file: notionService.js:67 ~ createPages ~ mongoData:", mongoData)
 
     if (!mongoData) {
         throw new Error('Data not found in MongoDB');
@@ -79,8 +88,8 @@ function getStorageOptionId(locationName, options) {
     const createdRows = [];
     for (let data of mongoData) {
         const storageOptionId = getStorageOptionId(data.location, storageOptions);
-        console.log("🚀 ~ file: notionService.js:80 ~ createPages ~ data.location:", data.location)
-        console.log("🚀 ~ file: notionService.js:80 ~ createPages ~ storageOptionId:", storageOptionId)
+        // console.log("🚀 ~ file: notionService.js:80 ~ createPages ~ data.location:", data.location)
+        // console.log("🚀 ~ file: notionService.js:80 ~ createPages ~ storageOptionId:", storageOptionId)
 
         // console.log("logging data.name when iterating through data of mondoData in notionService", data);
         const notionData = await notion.pages.create({
@@ -123,11 +132,13 @@ function getStorageOptionId(locationName, options) {
     }
     console.log("skipittytoilet:: ", createdRows[0].properties.MONGO_ID.rich_text[0].plain_text);
     console.log("itsabwoodapp:: ", createdRows[0].id);
-    addNotionIDToMongoEntryVariable(createdRows);
+    // addNotionIDToMongoEntryVariable(createdRows);
 
     // Return the created rows and mongo data instead of sending a response
     return { mongoData, createdRows };
 });
+
+
 
 
 // const createPages = asyncWrapper(async(req, res) => {

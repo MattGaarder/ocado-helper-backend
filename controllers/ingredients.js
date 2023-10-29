@@ -34,12 +34,11 @@ const updateIngredient = asyncWrapper(async (req, res, next) => {
 const addIngredients = asyncWrapper(async (req, res, next) => {
     const ingredients = req.body.ingredients;
     console.log(req.body);
-    // console.log("🚀 ~ file: ingredients.js:35 ~ addIngredients ~ ingredients:", ingredients)
+    console.log("🚀 ~ file: ingredients.js:35 ~ addIngredients ~ ingredients:", ingredients)
     const ingredientObjects = ingredients.map(ingredient => ({
         name: ingredient.name,
         location: ingredient.location }));
     const insertedIngredients = await Ingredient.insertMany(ingredientObjects);
-    console.log("🚀 ~ file: sas ingredients.js:42 ~ addIngredients ~ ingredientObjects:", ingredientObjects)
     const result = await createPages(insertedIngredients);
     res.status(200).json({ ingredients: insertedIngredients, ...result });
     // I want to call the Notion function here
